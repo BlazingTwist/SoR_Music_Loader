@@ -1,0 +1,109 @@
+﻿// About:
+  // AudioTypes, frequently used values
+    // WAV       - i.e. *.wav files
+    // MPEG      - i.e. *.mp2 / *.mp3 files
+      // WARNING: Unity does not support playing streamed MPEG audio, so it will be converted to WAV, this might cause long loading screens
+      // Consider converting your files to WAV or OGGVORBIS manually
+	// OGGVORBIS - i.e. *.ogg files
+	// for more info, check the Unity Documentation on the `AudioType`-type
+  // filePath
+    // you can either use relative paths (starting from `.../BepInEx/config/blazingtwist.sor.musicloader/`)
+	// or absolute paths (i.e. `C:/path/to/track.mp3`)
+
+- trackList :
+
+-- "Level1_1" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level1_2" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level1_3" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level2_1" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level2_2" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level2_3" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level3_1" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level3_2" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level3_3" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level4_1" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level4_2" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level4_3" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level5_1" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level5_2" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level5_3" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Level6" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Intro_Loop" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Track_A_Tutorial_Start" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Home_Base_v2" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Track_Hype_v4" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "Credits" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "SpeechMain" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "SpeechEnding" :
+--- audioType = MPEG
+--- filePath = ""
+
+-- "TitleScreen" :
+--- audioType = MPEG
+--- filePath = ""
