@@ -10,6 +10,10 @@ namespace SoR_Music_Loader.music_loader {
 		public string filePath;
 		public Action<CustomMusicLoadSpec, AudioClip> callback;
 
+		public string GetDisplayName() {
+			return modDirName + "_" + trackName;
+		}
+		
 		public string GetAbsolutePath() {
 			if (filePath == null) {
 				return null;
@@ -25,6 +29,10 @@ namespace SoR_Music_Loader.music_loader {
 					.Replace("//", "/")
 					.Replace('/', Path.DirectorySeparatorChar)
 			);
+		}
+
+		public override string ToString() {
+			return "CustomMusicLoadSpec{" + GetDisplayName() + " | type: " + audioType + " | path: " + filePath + "}";
 		}
 	}
 }

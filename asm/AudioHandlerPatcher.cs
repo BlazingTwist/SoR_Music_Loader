@@ -22,10 +22,12 @@ namespace SoR_Music_Loader.asm {
 		}
 
 		internal static void OnCustomTrackAddition(CustomMusicLoadSpec loadSpec) {
+			Debug.Log("Enqueueing new custom track: " + loadSpec);
 			customMusicAdditionQueue.Add(loadSpec);
 		}
 
 		internal static void OnCustomTrackChanged(CustomMusicLoadSpec loadSpec) {
+			Debug.Log("Enqueueing changed custom track: " + loadSpec);
 			customMusicChangedQueue.Add(loadSpec);
 		}
 
@@ -51,10 +53,11 @@ namespace SoR_Music_Loader.asm {
 		}
 
 		private static void OnTrackLoaded(AudioHandler audioHandler, string trackName, AudioClip audioClip) {
+			Debug.Log("CustomTrack " + trackName + " finished loading, clip is " + (audioClip == null ? "null" : "not null"));
 			if (audioClip == null) {
 				audioHandler.gc.sessionDataBig.musicTrackDic.Remove(trackName);
 			} else {
-				audioHandler.gc.sessionDataBig.musicTrackDic[trackName] = audioClip;				
+				audioHandler.gc.sessionDataBig.musicTrackDic[trackName] = audioClip;
 			}
 		}
 
@@ -83,11 +86,23 @@ namespace SoR_Music_Loader.asm {
 			clipAdditionQueue.Clear();
 
 			foreach (CustomMusicLoadSpec customMusicLoadSpec in customMusicAdditionQueue) {
+				Debug.Log("Starting load for new custom track: " + customMusicLoadSpec);
+				Action<CustomMusicLoadSpec, AudioClip> previousCallback = customMusicLoadSpec.callback;
+				customMusicLoadSpec.callback = (loadSpec, clip) => {
+					previousCallback?.Invoke(loadSpec, clip);
+					OnTrackLoaded(audioHandler, loadSpec.GetDisplayName(), clip);
+				};
 				TrackConfigManager.instance.StartCoroutine(TrackLoadingUtils.LoadMusicTrack(customMusicLoadSpec));
 			}
 			customMusicAdditionQueue.Clear();
 
 			foreach (CustomMusicLoadSpec customMusicLoadSpec in customMusicChangedQueue) {
+				Debug.Log("Starting load for changed custom track: " + customMusicLoadSpec);
+				Action<CustomMusicLoadSpec, AudioClip> previousCallback = customMusicLoadSpec.callback;
+				customMusicLoadSpec.callback = (loadSpec, clip) => {
+					previousCallback?.Invoke(loadSpec, clip);
+					OnTrackLoaded(audioHandler, loadSpec.GetDisplayName(), clip);
+				};
 				TrackConfigManager.instance.StartCoroutine(TrackLoadingUtils.LoadMusicTrack(customMusicLoadSpec));
 			}
 			customMusicChangedQueue.Clear();

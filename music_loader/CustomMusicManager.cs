@@ -128,7 +128,7 @@ namespace SoR_Music_Loader.music_loader {
 		}
 
 		private static void OnCustomTrackLoaded(CustomMusicLoadSpec loadSpec, AudioClip clip) {
-			string trackName = loadSpec.modDirName + "_" + loadSpec.trackName;
+			string trackName = loadSpec.GetDisplayName();
 
 			if (clip == null) {
 				customMusic.Remove(trackName);

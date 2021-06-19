@@ -258,6 +258,10 @@
           <HintPath>..\SoR_BepInEx_Libraries\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
 
+        <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\SoR_BepInEx_Libraries\UnityEngine.UI.dll</HintPath>
+        </Reference>
+
         <Reference Include="UnityEngine.UnityWebRequestAudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <HintPath>..\SoR_BepInEx_Libraries\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
         </Reference>

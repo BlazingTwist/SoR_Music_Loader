@@ -7,15 +7,6 @@ using HarmonyLib;
 using SoR_Music_Loader.music_loader;
 
 namespace SoR_Music_Loader.asm {
-	[HarmonyPatch]
-	public static class LevelEditorExtension {
-		[HarmonyReversePatch]
-		[HarmonyPatch(typeof(LevelEditor), "SetScrollBarPlacement")]
-		public static IEnumerator SetScrollBarPlacementReverse(this LevelEditor __instance) {
-			throw new NotImplementedException("SetScrollBarPlacement hasn't been patched yet!");
-		}
-	}
-
 	public class LevelEditorPatcher : RuntimePatcher {
 		public override void ApplyPatches() {
 			Type originalType = typeof(LevelEditor);
@@ -23,7 +14,7 @@ namespace SoR_Music_Loader.asm {
 
 			MethodInfo createMusicListOriginal = AccessTools.Method(originalType, nameof(LevelEditor.CreateMusicList));
 
-			var createMusicListPrefix = new HarmonyMethod(patcherType, nameof(CreateMusicListPrefix), new[] { originalType, typeof(bool).MakeByRefType() });
+			var createMusicListPrefix = new HarmonyMethod(patcherType, nameof(CreateMusicListPrefix), new[] { originalType, typeof(float).MakeByRefType() });
 
 			harmony.Patch(createMusicListOriginal, createMusicListPrefix);
 		}
@@ -52,8 +43,16 @@ namespace SoR_Music_Loader.asm {
 			__instance.ActivateLoadMenu();
 			___numButtonsLoad = trackList.Count;
 			__instance.OpenObjectLoad(trackList);
-			__instance.StartCoroutine(__instance.SetScrollBarPlacementReverse());
+			__instance.StartCoroutine(SetScrollBarPlacement(__instance));
 			return false;
+		}
+
+		private static IEnumerator SetScrollBarPlacement(LevelEditor instance) {
+			yield return null;
+			int scrollBarNum = instance.GetScrollBarNum();
+			instance.scrollBarLoad.value = scrollBarNum == -1
+					? 1f
+					: instance.loadScrollbarPosAll[scrollBarNum];
 		}
 	}
 }
