@@ -8,10 +8,16 @@ using UnityEngine.Networking;
 using NAudio.Wave;
 
 namespace SoR_Music_Loader.music_loader {
-	public static class TrackLoadingUtils {
-		public static AudioClip LoadMusicTrackNow(TrackConfig trackConfig) {
+	internal static class TrackLoadingUtils {
+		internal static AudioClip LoadMusicTrackNow(TrackConfig trackConfig) {
 			AudioClip audioClip = null;
 			string path = trackConfig.GetAbsolutePath();
+
+			if (!File.Exists(path)) {
+				Debug.LogError("Unable to load track at path: " + path + "! File does not exist.");
+				return null;
+			}
+
 			UnityWebRequest webRequest = trackConfig.audioType == AudioType.MPEG
 					? UnityWebRequest.Get(path)
 					: UnityWebRequestMultimedia.GetAudioClip(path, trackConfig.audioType);
@@ -34,9 +40,16 @@ namespace SoR_Music_Loader.music_loader {
 			return audioClip;
 		}
 
-		public static IEnumerator LoadMusicTrack(TrackConfig trackConfig, Action<AudioClip> callback) {
+		internal static IEnumerator LoadMusicTrack(TrackConfig trackConfig, Action<AudioClip> callback) {
 			AudioClip audioClip = null;
 			string path = trackConfig.GetAbsolutePath();
+
+			if (!File.Exists(path)) {
+				Debug.LogError("Unable to load track at path: " + path + "! File does not exist.");
+				callback?.Invoke(null);
+				yield break;
+			}
+
 			UnityWebRequest webRequest = trackConfig.audioType == AudioType.MPEG
 					? UnityWebRequest.Get(path)
 					: UnityWebRequestMultimedia.GetAudioClip(path, trackConfig.audioType);
@@ -59,7 +72,39 @@ namespace SoR_Music_Loader.music_loader {
 			callback.Invoke(audioClip);
 		}
 
-		private static AudioClip Mp3ToWavClip(string clipName, byte[] mp3Data) {
+		internal static IEnumerator LoadMusicTrack(CustomMusicLoadSpec loadSpec) {
+			AudioClip audioClip = null;
+			string path = loadSpec.GetAbsolutePath();
+
+			if (!File.Exists(path)) {
+				Debug.LogError("Unable to load track at path: " + path + "! File does not exist.");
+				loadSpec.callback?.Invoke(loadSpec, null);
+				yield break;
+			}
+
+			UnityWebRequest webRequest = loadSpec.audioType == AudioType.MPEG
+					? UnityWebRequest.Get(path)
+					: UnityWebRequestMultimedia.GetAudioClip(path, loadSpec.audioType);
+
+			webRequest.SendWebRequest();
+			while (!webRequest.isDone) {
+				yield return new WaitForSecondsRealtime(0.05f);
+			}
+
+			if (webRequest.isNetworkError || webRequest.isHttpError) {
+				Debug.LogError("Failed to load musicTrack at: " + path);
+			} else {
+				audioClip = loadSpec.audioType == AudioType.MPEG
+						? Mp3ToWavClip(Path.GetFileName(path) + ".wav", webRequest.downloadHandler.data)
+						: DownloadHandlerAudioClip.GetContent(webRequest);
+
+				webRequest.Dispose();
+			}
+
+			loadSpec.callback?.Invoke(loadSpec, audioClip);
+		}
+
+		internal static AudioClip Mp3ToWavClip(string clipName, byte[] mp3Data) {
 			var mp3Stream = new MemoryStream(mp3Data);
 			var mp3Reader = new Mp3FileReader(mp3Stream);
 			WaveStream waveStream = WaveFormatConversionStream.CreatePcmStream(mp3Reader);

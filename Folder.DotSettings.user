@@ -14,6 +14,8 @@
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=D_003A_005CProgrammierung_005CVisualStudioProjects_005CSoR_005FModding_005CSoR_005FBepInEx_005FLibraries_005CUnityEngine_002EAudioModule_002Edll/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=D_003A_005CProgrammierung_005CVisualStudioProjects_005CSoR_005FModding_005CSoR_005FBepInEx_005FLibraries_005CUnityEngine_002ECoreModule_002Edll/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=D_003A_005CProgrammierung_005CVisualStudioProjects_005CSoR_005FModding_005CSoR_005FBepInEx_005FLibraries_005CUnityEngine_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=D_003A_005CProgrammierung_005CVisualStudioProjects_005CSoR_005FModding_005CSoR_005FBepInEx_005FLibraries_005CUnityEngine_002EUI_002Edll/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=D_003A_005CProgrammierung_005CVisualStudioProjects_005CSoR_005FModding_005CSoR_005FBepInEx_005FLibraries_005CUnityEngine_002EUnityWebRequestAudioModule_002Edll/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=D_003A_005CProgrammierung_005CVisualStudioProjects_005CSoR_005FModding_005CSoR_005FBepInEx_005FLibraries_005CUnityEngine_002EUnityWebRequestModule_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=musicloader/@EntryIndexedValue">True</s:Boolean>
 	</wpf:ResourceDictionary>

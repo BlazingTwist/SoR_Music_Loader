@@ -9,13 +9,33 @@ using UnityEngine;
 
 namespace SoR_Music_Loader.asm {
 	public class AudioHandlerPatcher : RuntimePatcher {
+		internal static void OnTrackAddition(string trackName, TrackConfig trackConfig) {
+			trackAdditionQueue[trackName] = trackConfig;
+		}
+
+		internal static void OnTrackChanged(string trackName, TrackConfig trackConfig) {
+			trackChangedQueue[trackName] = trackConfig;
+		}
+
+		internal static void OnClipAddition(string trackName, AudioClip clip) {
+			clipAdditionQueue[trackName] = clip;
+		}
+
+		internal static void OnCustomTrackAddition(CustomMusicLoadSpec loadSpec) {
+			customMusicAdditionQueue.Add(loadSpec);
+		}
+
+		internal static void OnCustomTrackChanged(CustomMusicLoadSpec loadSpec) {
+			customMusicChangedQueue.Add(loadSpec);
+		}
+
 		private static readonly Dictionary<string, TrackConfig> trackAdditionQueue = new Dictionary<string, TrackConfig>();
 		private static readonly Dictionary<string, TrackConfig> trackChangedQueue = new Dictionary<string, TrackConfig>();
+		private static readonly Dictionary<string, AudioClip> clipAdditionQueue = new Dictionary<string, AudioClip>();
+		private static readonly List<CustomMusicLoadSpec> customMusicAdditionQueue = new List<CustomMusicLoadSpec>();
+		private static readonly List<CustomMusicLoadSpec> customMusicChangedQueue = new List<CustomMusicLoadSpec>();
 
 		public override void ApplyPatches() {
-			TrackConfigManager.onTrackAddition += (name, track) => { trackAdditionQueue[name] = track; };
-			TrackConfigManager.onTrackChanged += (name, track) => { trackChangedQueue[name] = track; };
-
 			Type originalType = typeof(AudioHandler);
 			Type patcherType = typeof(AudioHandlerPatcher);
 
@@ -31,31 +51,47 @@ namespace SoR_Music_Loader.asm {
 		}
 
 		private static void OnTrackLoaded(AudioHandler audioHandler, string trackName, AudioClip audioClip) {
-			audioHandler.gc.sessionDataBig.musicTrackDic[trackName] = audioClip;
+			if (audioClip == null) {
+				audioHandler.gc.sessionDataBig.musicTrackDic.Remove(trackName);
+			} else {
+				audioHandler.gc.sessionDataBig.musicTrackDic[trackName] = audioClip;				
+			}
 		}
 
-		public static void MusicLoad(AudioHandler audioHandler) {
-			foreach (KeyValuePair<string, TrackConfig> trackAddition in trackAdditionQueue) {
+		private static void MusicLoad(AudioHandler audioHandler) {
+			foreach ((string key, TrackConfig config) in trackAdditionQueue) {
 				TrackConfigManager.instance.StartCoroutine(
 						TrackLoadingUtils.LoadMusicTrack(
-								trackAddition.Value,
-								clip => OnTrackLoaded(audioHandler, trackAddition.Key, clip)
-						)
+								config,
+								clip => OnTrackLoaded(audioHandler, key, clip))
 				);
 			}
-
 			trackAdditionQueue.Clear();
 
-			foreach (KeyValuePair<string, TrackConfig> trackAddition in trackChangedQueue) {
+			foreach ((string key, TrackConfig config) in trackChangedQueue) {
 				TrackConfigManager.instance.StartCoroutine(
 						TrackLoadingUtils.LoadMusicTrack(
-								trackAddition.Value,
-								clip => OnTrackLoaded(audioHandler, trackAddition.Key, clip)
-						)
+								config,
+								clip => OnTrackLoaded(audioHandler, key, clip))
 				);
 			}
-
 			trackChangedQueue.Clear();
+
+			foreach ((string trackName, AudioClip clip) in clipAdditionQueue) {
+				OnTrackLoaded(audioHandler, trackName, clip);
+			}
+			clipAdditionQueue.Clear();
+
+			foreach (CustomMusicLoadSpec customMusicLoadSpec in customMusicAdditionQueue) {
+				TrackConfigManager.instance.StartCoroutine(TrackLoadingUtils.LoadMusicTrack(customMusicLoadSpec));
+			}
+			customMusicAdditionQueue.Clear();
+
+			foreach (CustomMusicLoadSpec customMusicLoadSpec in customMusicChangedQueue) {
+				TrackConfigManager.instance.StartCoroutine(TrackLoadingUtils.LoadMusicTrack(customMusicLoadSpec));
+			}
+			customMusicChangedQueue.Clear();
+
 			RunTitleScreenFix();
 		}
 
@@ -63,7 +99,7 @@ namespace SoR_Music_Loader.asm {
 			// have to patch title screen manually here because the logo screen used the index instead of the key
 			var audioHandler = AudioHandler.audioHandler;
 			if (audioHandler != null) {
-				Dictionary<string,AudioClip> musicTrackDic = audioHandler.gc.sessionDataBig.musicTrackDic;
+				Dictionary<string, AudioClip> musicTrackDic = audioHandler.gc.sessionDataBig.musicTrackDic;
 				if (musicTrackDic.ContainsKey(LogoMenuPatcher.TitleScreenTrack) && musicTrackDic[LogoMenuPatcher.TitleScreenTrack] != null) {
 					AudioClip realClip = musicTrackDic["TitleScreen"];
 					if (audioHandler.musicTrackRealList.Count > 23 && realClip != audioHandler.musicTrackRealList[23]) {

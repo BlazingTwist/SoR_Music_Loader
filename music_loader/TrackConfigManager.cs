@@ -1,29 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using BlazingTwistConfigTools.blazingtwist.config;
+using SoR_Music_Loader.asm;
 using SoR_Music_Loader.music_loader.config;
 using UnityEngine;
 
 namespace SoR_Music_Loader.music_loader {
-	public class TrackConfigManager : MonoBehaviour {
-		public static TrackConfigManager instance;
-		public static TracksConfig trackConfig;
+	internal class TrackConfigManager : MonoBehaviour {
+		internal static TrackConfigManager instance;
+		internal static TracksConfig trackConfig;
 
 		private static GameObject targetParent;
 		private static float nextConfigCheckIn;
-		private static readonly string configPath = Application.dataPath + "/../BepInEx/config/" + SorMusicLoader.pluginGuid + ".cs";
+		private static string configPath;
 
-		public delegate void OnTrackAdditionHandler(string trackName, TrackConfig trackConfig);
-
-		public static event OnTrackAdditionHandler onTrackAddition;
-
-		public delegate void OnTrackChangedHandler(string trackName, TrackConfig trackConfig);
-
-		public static event OnTrackChangedHandler onTrackChanged;
-
-		public static void AttachToScene() {
+		internal static void AttachToScene() {
 			if (targetParent != null) {
 				return;
 			}
@@ -39,6 +31,7 @@ namespace SoR_Music_Loader.music_loader {
 
 		private void Awake() {
 			instance = this;
+			configPath = Application.dataPath + "/../BepInEx/config/" + SorMusicLoader.pluginGuid + ".cs";
 			ReloadConfig();
 		}
 
@@ -57,8 +50,8 @@ namespace SoR_Music_Loader.music_loader {
 					// on first load every track is "new"
 					IEnumerable<KeyValuePair<string, TrackConfig>>
 							newTracks = trackConfig.trackList.Where(entry => !string.IsNullOrEmpty(entry.Value.filePath));
-					foreach (KeyValuePair<string, TrackConfig> newTrack in newTracks) {
-						onTrackAddition?.Invoke(newTrack.Key, newTrack.Value);
+					foreach ((string key, TrackConfig value) in newTracks) {
+						AudioHandlerPatcher.OnTrackAddition(key, value);
 					}
 				}
 			} else {
@@ -70,16 +63,16 @@ namespace SoR_Music_Loader.music_loader {
 				if (trackConfig != null) {
 					IEnumerable<KeyValuePair<string, TrackConfig>> newTracks = trackConfig.trackList
 							.Where(entry => !previousData.ContainsKey(entry.Key) && !string.IsNullOrEmpty(entry.Value.filePath));
-					foreach (KeyValuePair<string, TrackConfig> newTrack in newTracks) {
-						onTrackAddition?.Invoke(newTrack.Key, newTrack.Value);
+					foreach ((string key, TrackConfig value) in newTracks) {
+						AudioHandlerPatcher.OnTrackAddition(key, value);
 					}
 
 					IEnumerable<KeyValuePair<string, TrackConfig>> tracksWithChangedFilePath = trackConfig.trackList
 							.Where(entry => previousData.ContainsKey(entry.Key)
 									&& !string.IsNullOrEmpty(entry.Value.filePath)
 									&& !previousData[entry.Key].Equals(entry.Value.filePath));
-					foreach (KeyValuePair<string, TrackConfig> changedTrack in tracksWithChangedFilePath) {
-						onTrackChanged?.Invoke(changedTrack.Key, changedTrack.Value);
+					foreach ((string key, TrackConfig value) in tracksWithChangedFilePath) {
+						AudioHandlerPatcher.OnTrackChanged(key, value);
 					}
 				}
 			}

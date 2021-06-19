@@ -1,12 +1,14 @@
-﻿using System.IO;
-using JetBrains.Annotations;
+﻿using System;
+using System.IO;
 using UnityEngine;
 
-namespace SoR_Music_Loader.music_loader.config {
-	[PublicAPI]
-	public class TrackConfig {
+namespace SoR_Music_Loader.music_loader {
+	internal class CustomMusicLoadSpec {
+		public string trackName;
+		public string modDirName;
 		public AudioType audioType;
 		public string filePath;
+		public Action<CustomMusicLoadSpec, AudioClip> callback;
 
 		public string GetAbsolutePath() {
 			if (filePath == null) {
@@ -19,7 +21,7 @@ namespace SoR_Music_Loader.music_loader.config {
 			}
 
 			return Path.GetFullPath(
-					(Application.dataPath + "/../BepInEx/config/" + SorMusicLoader.pluginGuid + "/" + filePath)
+					(CustomMusicManager.configBasePath + modDirName + "/" + filePath)
 					.Replace("//", "/")
 					.Replace('/', Path.DirectorySeparatorChar)
 			);

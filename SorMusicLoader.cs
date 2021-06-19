@@ -14,9 +14,11 @@ namespace SoR_Music_Loader {
 
 		public void Awake() {
 			var harmony = new Harmony(pluginGuid);
+			harmony.PatchAll();
 			RuntimePatcherUtils.RunPatchers(Logger, harmony, RuntimePatcherUtils.GetTypesInNamespace(Assembly.GetExecutingAssembly(), "SoR_Music_Loader.asm"));
 			
 			TrackConfigManager.AttachToScene();
+			CustomMusicManager.AttachToScene();
 		}
 	}
 }

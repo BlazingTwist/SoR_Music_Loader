@@ -269,9 +269,14 @@
     <ItemGroup>
         <Compile Include="asm\AudioHandlerPatcher.cs" />
         <Content Include="documentation\blazingtwist.sor.musicloader.txt" />
+        <Compile Include="asm\LevelEditorPatcher.cs" />
         <Compile Include="asm\LogoMenuPatcher.cs" />
+        <Compile Include="music_loader\api\BTMusicLoader.cs" />
         <Compile Include="music_loader\config\TrackConfig.cs" />
         <Compile Include="music_loader\config\TracksConfig.cs" />
+        <Compile Include="music_loader\CustomMusicLoadSpec.cs" />
+        <Compile Include="music_loader\CustomMusicManager.cs" />
+        <Compile Include="music_loader\MusicLoadResult.cs" />
         <Compile Include="music_loader\TrackConfigManager.cs" />
         <Compile Include="music_loader\TrackLoadingUtils.cs" />
         <Compile Include="music_loader\WAVConverter.cs" />
