@@ -1,8 +1,42 @@
-﻿## For Modders
-The default config comes with keys to replace all in-game tracks,  
-however you can specify custom music by making use of either the Api-Methods or Mod-Configs
+﻿# Replacing Ingame Music
+The default config comes with keys to replace all in-game tracks, as well as documentation that should be enough to get you started.  
+You can find it in `BepInEx/config/blazingtwist.sor.musicloader.cs` (I recommend opening it with notepad++, which will automatically use decent looking syntax-highlighting)  
 
-### Mod-Configs
+On MPEG: Unity no longer supports mp3 streaming, so any mp3 files will be converted to wav in memory.  
+It is advisable to convert your mp3 files to .wav or .ogg to reduce loading-times.
+
+There's 24 tracks you can replace:
+* `Level1_1` - Slums 1
+* `Level1_2` - Slums 2
+* `Level1_3` - Slums 3
+* `Level2_1` - Industrial 1
+* `Level2_2` - Industrial 2
+* `Level2_3` - Industrial 3
+* `Level3_1` - Park 1
+* `Level3_2` - Park 2
+* `Level3_3` - Park 3
+* `Level4_1` - Downtown 1
+* `Level4_2` - Downtown 2
+* `Level4_3` - Downtown 3
+* `Level5_1` - Uptown 1
+* `Level5_2` - Uptown 2
+* `Level5_3` - Uptown 3
+* `Level6` - Mayor Village
+* `Intro_Loop`
+* `Track_A_Tutorial_Start`
+* `Home_Base_v2` - Home Base
+* `Track_Hype_v4`
+* `Credits`
+* `SpeechMain`
+* `SpeechEnding`
+* `TitleScreen`
+
+<br/>
+
+# Adding Your Own Music (For Modders)
+If replacing the existing music isn't enough for you, it's also possible to specify custom music by making use of either the Api-Methods or Mod-Configs
+
+### **Mod-Configs**
 
 Mod-Configs allow you to add custom music without writing your own mod.  
 Custom music added this way requires a config-file in `[...]/BepInEx/config/blazingtwist.sor.musicloader/custom/`  
@@ -25,7 +59,7 @@ As such, if you want to use relative paths, you'll need to create a directory of
 
 ---
 
-### Api-Methods
+### **Api-Methods**
 Api-Methods allow your mod to take control over how music is loaded from the disk.  
 Want to use a non-standard location or bundle your music in another format? You can.
 
@@ -75,4 +109,32 @@ Some basic examples:
     byte[] mp3Data = File.ReadAllBytes("C:/Music/track4.mp3");
     AudioClip clip = BTMusicLoader.Mp3ToWavClip(mp3Data);
     // use AudioClip to do something
+    ```
+
+<br/>
+
+# About the Config-Language
+It's basically YAML, except
+* indentations are replaced with `-`
+* Any whitespace is ignored unless it is enclosed in `"<whitespace here>"`
+* `=` indicates assignment of a simple value. For example:  
+    c# `int someVal = 100;`  
+    corresponds to config `- someVal = 100`
+* `:` indicates assignment of a List, Dictionary or Object. For example:  
+    c#
+    ```c#
+    Dictionary<string, List<string>> someDict = new Dictionary<string, List<string>> {
+            { "key1", new List<string> { "key1_val1", "key1_val2" } },
+            { "key2", new List<string> { "key2_val1", "key2_val2" } }
+    };
+    ```  
+    corresponds to config
+    ```
+    - someDict :
+    -- key1 :
+    --- key1_val1
+    --- key1_val2
+    -- key2 :
+    --- key2_val1
+    --- key2_val2
     ```
