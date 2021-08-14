@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Xml.Serialization;
 using BlazingTwist_Core;
 using HarmonyLib;
 using SoR_Music_Loader.music_loader;
@@ -48,7 +52,107 @@ namespace SoR_Music_Loader.asm {
 			harmony.Patch(musicLoadOriginal, musicLoadPrefix);
 		}
 
+		private static bool runScript = false;
+
+		private class UnlockData {
+			public string unlockName;
+			public string unlockNameType;
+			public string unlockType;
+			public bool unlocked;
+			public bool nowAvailable;
+			public bool unavailable;
+			public bool isUpgrade;
+			public bool cantSwap;
+			public bool cantLose;
+			public List<string> cancellations;
+			public List<string> recommendations;
+			public string upgrade;
+			public int cost;
+			public int cost2;
+			public int cost3;
+
+			public UnlockData(Unlock unlock) {
+				unlockName = unlock.unlockName;
+				unlockNameType = unlock.unlockNameType;
+				unlockType = unlock.unlockType;
+				unlocked = unlock.unlocked;
+				nowAvailable = unlock.nowAvailable;
+				unavailable = unlock.unavailable;
+				isUpgrade = unlock.isUpgrade;
+				cantSwap = unlock.cantSwap;
+				cantLose = unlock.cantLose;
+				cancellations = unlock.cancellations;
+				recommendations = unlock.recommendations;
+				upgrade = unlock.upgrade;
+				cost = unlock.cost;
+				cost2 = unlock.cost2;
+				cost3 = unlock.cost3;
+			}
+
+			public static void AddHeaderRow(StringBuilder builder) {
+				builder.Append(nameof(unlockName))
+						.Append("\t").Append(nameof(unlockNameType))
+						.Append("\t").Append(nameof(unlockType))
+						.Append("\t").Append(nameof(unlocked))
+						.Append("\t").Append(nameof(nowAvailable))
+						.Append("\t").Append(nameof(unavailable))
+						.Append("\t").Append(nameof(isUpgrade))
+						.Append("\t").Append(nameof(cantSwap))
+						.Append("\t").Append(nameof(cantLose))
+						.Append("\t").Append(nameof(cancellations))
+						.Append("\t").Append(nameof(recommendations))
+						.Append("\t").Append(nameof(upgrade))
+						.Append("\t").Append(nameof(cost))
+						.Append("\t").Append(nameof(cost2))
+						.Append("\t").Append(nameof(cost3));
+			}
+			
+			public void ToString(StringBuilder builder) {
+				builder.Append(unlockName)
+						.Append("\t").Append(unlockNameType)
+						.Append("\t").Append(unlockType)
+						.Append("\t").Append(unlocked)
+						.Append("\t").Append(nowAvailable)
+						.Append("\t").Append(unavailable)
+						.Append("\t").Append(isUpgrade)
+						.Append("\t").Append(cantSwap)
+						.Append("\t").Append(cantLose)
+						.Append("\t").Append("[").Append(cancellations.Join(str => "'" + str + "'", ", ")).Append("]")
+						.Append("\t").Append("[").Append(recommendations.Join(str => "'" + str + "'", ", ")).Append("]")
+						.Append("\t").Append(upgrade)
+						.Append("\t").Append(cost)
+						.Append("\t").Append(cost2)
+						.Append("\t").Append(cost3);
+			}
+		}
+
 		private static void MusicLoadPrefix(AudioHandler __instance) {
+			// TODO debug info
+			if (!runScript) {
+				using (StreamWriter writer = new StreamWriter(@"D:\sorUnlocksFile.txt", false)) {
+					__instance.gc.unlocks.LoadInitialUnlocks();
+					StringBuilder stringBuilder = new StringBuilder();
+					UnlockData.AddHeaderRow(stringBuilder);
+					stringBuilder.Append("\n");
+					foreach (UnlockData unlockData in __instance.gc.sessionDataBig.traitUnlocksCharacterCreation.Select(unlock => new UnlockData(unlock))) {
+						unlockData.ToString(stringBuilder);
+						stringBuilder.Append("\n");
+					}
+
+					stringBuilder.Append("\n\nOther traits\n");
+					foreach (UnlockData unlockData in __instance.gc.sessionDataBig.unlocks
+							.Where(unlock => unlock.unlockType == "Trait")
+							.Select(unlock => new UnlockData(unlock))) {
+						unlockData.ToString(stringBuilder);
+						stringBuilder.Append("\n");
+					}
+					
+					writer.WriteLine(stringBuilder.ToString());
+				}
+				runScript = true;
+			}
+			// ===============
+
 			MusicLoad(__instance);
 		}
 
