@@ -288,6 +288,9 @@
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
+      <Content Include="documentation\builder.html" />
+      <Content Include="documentation\img\FilesExample.png" />
+      <Content Include="documentation\img\GuiExample.png" />
       <Content Include="documentation\ReadMe.md" />
     </ItemGroup>
     <ItemGroup>

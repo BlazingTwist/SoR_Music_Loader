@@ -1,4 +1,4 @@
-﻿# Replacing Ingame Music
+﻿# Replacing In-game Music
 The default config comes with keys to replace all in-game tracks, as well as documentation that should be enough to get you started.  
 You can find it in `BepInEx/config/blazingtwist.sor.musicloader.cs` (I recommend opening it with notepad++, which will automatically use decent looking syntax-highlighting)  
 
@@ -30,6 +30,21 @@ There's 24 tracks you can replace:
 * `SpeechMain`
 * `SpeechEnding`
 * `TitleScreen`
+
+<br/>
+
+# Using the Config Builder GUI
+
+The GUI lets you select a File for each of the default tracks.  
+You will need to specify a name for your mod (e.g. 'MyMod') and then place your songs in the corresponding Directory. In this case: `BepInEx/config/blazingtwist.sor.musicloader.cs/MyMod/`.
+
+For example, if your GUI looks like this:
+
+![image of gui with two songs selected](documentation/img/GuiExample.png)
+
+Then you should have your files organized like this:
+
+![image of the directory structure for two songs](documentation/img/FilesExample.png)
 
 <br/>
 

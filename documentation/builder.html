@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SoR Music Loader - Config Builder</title>
+
+    <style>
+        body {
+            margin: 0;
+        }
+
+        span, div, a, label {
+            color: white;
+            font-family: Lato, sans-serif;
+            font-weight: bold;
+        }
+
+        .flex-row {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .flex-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .flex-centered {
+            align-self: center;
+            align-items: center;
+            align-content: center;
+            justify-content: center;
+        }
+
+        .config-row {
+            padding: 10px 30px;
+            margin: 5px;
+            border-radius: 10px;
+            background-color: #12123b;
+            border: 5px outset #20205d;
+        }
+
+        .level-name-div {
+            width: 200px;
+            text-align: left;
+        }
+
+        .file-input-div {
+            text-align: left;
+        }
+
+        .file-type-div {
+            padding-left: 20px;
+            text-align: right;
+        }
+
+        .file-type-label {
+            padding-right: 20px;
+        }
+
+        .import-button, .export-button {
+            cursor: pointer;
+
+            font-size: 1.5em;
+            padding: 5px;
+        }
+
+        .export-button {
+            background: linear-gradient(0, #328c36, #4bb469, #2bff68);
+            background-size: 100% 200%;
+            background-position-y: 50%;
+            transition: background-position 0.1s linear;
+            text-align: center;
+            border: 2px outset #29652b;
+        }
+
+        .export-button:hover {
+            background-position-y: 0;
+        }
+    </style>
+</head>
+
+<body style="width: 100%; height: 100%; background-color: #333846">
+<div class="config-builder">
+    <div class="flex-column" id="config-container">
+
+    </div>
+    <div class="flex-row" style="padding-top: 10px; justify-content: center; gap: 15px">
+        <div class="flex-centered">
+            <label for="mod-name-input" id="mod-name-label"></label>
+        </div>
+        <div class="flex-centered">
+            <input type="text" id="mod-name-input" placeholder="Mod Name" style="text-align: center" onchange="modNameChanged()">
+        </div>
+        <div class="export-button" style="font-size: 1.5em" onclick="onExportClicked()">
+            Export
+        </div>
+    </div>
+</div>
+
+<script>
+    function modNameChanged() {
+        let modName = (document.getElementById("mod-name-input").value || "").trim();
+        let modNameLabel = document.getElementById("mod-name-label");
+        modNameLabel.innerText = "Music must be placed in\n'BepInEx/config/blazingtwist.sor.musicloader/" + modName + "/'"
+        if(modName.length > 0) {
+            modNameLabel.style.visibility = null;
+        }else{
+            modNameLabel.style.visibility = "hidden";
+        }
+    }
+    modNameChanged();
+
+    let levelNames = [
+        "Level1_1",
+        "Level1_2",
+        "Level1_3",
+        "Level2_1",
+        "Level2_2",
+        "Level2_3",
+        "Level3_1",
+        "Level3_2",
+        "Level3_3",
+        "Level4_1",
+        "Level4_2",
+        "Level4_3",
+        "Level5_1",
+        "Level5_2",
+        "Level5_3",
+        "Level6",
+        "Intro_Loop",
+        "Track_A_Tutorial_Start",
+        "Home_Base_v2",
+        "Track_Hype_v4",
+        "Credits",
+        "SpeechMain",
+        "SpeechEnding",
+        "TitleScreen",
+    ];
+
+    function makeOption(optionID, optionText, configText, extensions) {
+        return {optionID, optionText, configText, extensions};
+    }
+
+    /**
+     * @type {{optionID: string, optionText: string, configText: string, extensions: string[]}[]}
+     */
+    let fileOptions = [
+        makeOption("unknown", "Unknown Extension", "UNKNOWN", []),
+        makeOption("wav", "WAV", "WAV", ["wav", "wave"]),
+        makeOption("ogg-vorbis", "OGG-Vorbis", "OGGVORBIS", ["ogg", "oga", "mogg"]),
+        makeOption("mpeg", "MPEG (not recommended)", "MPEG", ["mp3", "mp4", "mpeg"]),
+    ]
+
+    function makeOptionData(levelName, fullFileName, audioType) {
+        return {levelName, fullFileName, audioType};
+    }
+
+    /**
+     * @type Map<string, {levelName: string, fullFileName: string, audioType: string}>
+     */
+    let optionData = new Map();
+
+    let configContainerDiv = document.getElementById("config-container");
+    for (let levelName of levelNames) {
+        let rowDiv = document.createElement("div");
+        rowDiv.classList.add("config-row", "flex-centered", "flex-row");
+
+        let levelNameDiv = document.createElement("div");
+        levelNameDiv.classList.add("level-name-div");
+        rowDiv.appendChild(levelNameDiv);
+
+        let levelNameSpan = document.createElement("span");
+        levelNameSpan.innerText = levelName;
+        levelNameDiv.appendChild(levelNameSpan);
+
+        let fileInputDiv = document.createElement("div");
+        fileInputDiv.classList.add("file-input-div");
+        rowDiv.appendChild(fileInputDiv);
+
+        let fileInputElement = document.createElement("input");
+        fileInputElement.type = "file";
+        fileInputDiv.appendChild(fileInputElement);
+
+        let fileTypeDiv = document.createElement("div");
+        fileTypeDiv.classList.add("file-type-div");
+        fileTypeDiv.style.visibility = "hidden";
+        rowDiv.appendChild(fileTypeDiv);
+
+        let fileTypeDropdownID = levelName + "-audio-type";
+        let fileTypeLabel = document.createElement("label");
+        fileTypeLabel.classList.add("file-type-label");
+        fileTypeLabel.htmlFor = fileTypeDropdownID;
+        fileTypeDiv.appendChild(fileTypeLabel);
+
+        let fileTypeLabelText = document.createElement("a");
+        fileTypeLabelText.href = "https://docs.unity3d.com/ScriptReference/AudioType.html";
+        fileTypeLabelText.innerText = "Audio Type";
+        fileTypeLabel.appendChild(fileTypeLabelText);
+
+        let fileTypeDropdown = document.createElement("select");
+        fileTypeDropdown.name = "audio-type";
+        fileTypeDropdown.id = fileTypeDropdownID;
+        fileTypeDiv.appendChild(fileTypeDropdown);
+
+        for (let fileOption of fileOptions) {
+            let optionElement = document.createElement("option");
+            optionElement.value = fileOption.optionID;
+            optionElement.innerText = fileOption.optionText;
+            fileTypeDropdown.appendChild(optionElement);
+        }
+
+        let thisOptionData = makeOptionData(levelName, "", fileOptions[0].configText);
+        optionData.set(levelName, thisOptionData);
+
+        let onDataChanged = function (fileChanged) {
+            let fileInputValue = fileInputElement.value;
+            if (fileChanged) {
+                fileInputElement.value = "";
+                if (fileInputValue == null || fileInputValue.trim().length <= 0) {
+                    fileTypeDiv.style.visibility = "hidden";
+                    thisOptionData.fullFileName = "";
+                    thisOptionData.audioType = fileOptions[0].configText;
+                    return;
+                }
+            }
+            fileTypeDiv.style.visibility = null;
+
+            if (fileChanged) {
+                let fullFileName = fileInputValue.split(/([\\/])/g).pop();
+                let fileExt = fullFileName.slice(fullFileName.lastIndexOf(".") + 1);
+
+                let possibleOptions = fileOptions.filter(opt => opt.extensions.includes(fileExt));
+                if (possibleOptions.length > 0) {
+                    fileTypeDropdown.selectedIndex = fileOptions.indexOf(possibleOptions[0]);
+                } else {
+                    fileTypeDropdown.selectedIndex = 0;
+                }
+
+                thisOptionData.fullFileName = fullFileName;
+            }
+
+            thisOptionData.audioType = fileOptions[fileTypeDropdown.selectedIndex].configText;
+
+            console.log("optionData: " + JSON.stringify(thisOptionData));
+        }
+
+        fileInputElement.onchange = () => onDataChanged(true);
+        fileTypeDropdown.onchange = () => onDataChanged(false);
+
+        configContainerDiv.appendChild(rowDiv);
+    }
+
+    function onExportClicked() {
+        let modName = document.getElementById("mod-name-input").value;
+        if (modName == null || modName.trim().length <= 0) {
+            window.alert("Mod Name may not be empty");
+            return;
+        }
+        modName = modName.trim();
+
+        let fileData = ""
+            + "// About:\n"
+            + "//   AudioTypes, frequently used values\n"
+            + "//     WAV       - i.e. *.wav files\n"
+            + "//     MPEG      - i.e. *.mp2 / *.mp3 files\n"
+            + "//       WARNING: Unity does not support playing streamed MPEG audio, so it will be converted to WAV, this might cause long loading screens\n"
+            + "//       Consider converting your files to WAV or OGGVORBIS manually\n"
+            + "//         OGGVORBIS - i.e. *.ogg files\n"
+            + "//         for more info, check the Unity Documentation on the `AudioType`-type\n"
+            + "//   filePath\n"
+            + "//     you can either use relative paths (starting from `.../BepInEx/config/blazingtwist.sor.musicloader/`)\n"
+            + "//       or absolute paths (i.e. `C:/path/to/track.mp3`)\n\n"
+            + "- trackList :\n";
+
+        for (let option of optionData.values()) {
+            let filePath = option.fullFileName.length > 0 ? (modName + "/" + option.fullFileName) : "";
+            let levelData = "\n"
+                + "-- \"" + option.levelName + "\" :\n"
+                + "--- audioType = " + option.audioType + "\n"
+                + "--- filePath = \"" + filePath + "\"\n";
+            fileData += levelData;
+        }
+        downloadFile(fileData, "blazingtwist.sor.musicloader.cs", "text/plain")
+    }
+
+    function downloadFile(data, fileName, type) {
+        let fileBlob = new Blob([data], {type: type});
+        let a = document.createElement("a");
+        let url = URL.createObjectURL(fileBlob);
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 0);
+    }
+</script>
+</body>
+
+</html>
