@@ -42,12 +42,25 @@
         }
 
         .level-name-div {
-            width: 200px;
+            width: 225px;
             text-align: left;
         }
 
         .file-input-div {
+            width: 200px;
+            align-items: center;
+            display: flex;
+            gap: 10px;
+            flex-direction: row;
+        }
+
+        .file-input-div > * {
+            font-size: 0.7em;
             text-align: left;
+            font-weight: lighter;
+        }
+
+        .file-input-label {
         }
 
         .file-type-div {
@@ -59,14 +72,22 @@
             padding-right: 20px;
         }
 
-        .import-button, .export-button {
+        .file-select-button, .export-button {
             cursor: pointer;
-
-            font-size: 1.5em;
             padding: 5px;
         }
 
+        .file-select-button {
+            background: linear-gradient(0, #444444, #666666, #888888);
+            background-size: 100% 200%;
+            background-position-y: 50%;
+            transition: background-position 0.1s linear;
+            text-align: center;
+            border: 2px outset #555555;
+        }
+
         .export-button {
+            font-size: 1.5em;
             background: linear-gradient(0, #328c36, #4bb469, #2bff68);
             background-size: 100% 200%;
             background-position-y: 50%;
@@ -75,7 +96,7 @@
             border: 2px outset #29652b;
         }
 
-        .export-button:hover {
+        .file-select-button:hover, .export-button:hover {
             background-position-y: 0;
         }
     </style>
@@ -104,12 +125,13 @@
         let modName = (document.getElementById("mod-name-input").value || "").trim();
         let modNameLabel = document.getElementById("mod-name-label");
         modNameLabel.innerText = "Music must be placed in\n'BepInEx/config/blazingtwist.sor.musicloader/" + modName + "/'"
-        if(modName.length > 0) {
+        if (modName.length > 0) {
             modNameLabel.style.visibility = null;
-        }else{
+        } else {
             modNameLabel.style.visibility = "hidden";
         }
     }
+
     modNameChanged();
 
     let levelNames = [
@@ -181,7 +203,17 @@
 
         let fileInputElement = document.createElement("input");
         fileInputElement.type = "file";
+        fileInputElement.style.display = "None";
         fileInputDiv.appendChild(fileInputElement);
+
+        let fileInputButton = document.createElement("div");
+        fileInputButton.classList.add("file-select-button");
+        fileInputButton.innerText = "Choose File";
+        fileInputDiv.appendChild(fileInputButton);
+
+        let fileInputLabel = document.createElement("span");
+        fileInputLabel.classList.add("file-input-label");
+        fileInputDiv.appendChild(fileInputLabel);
 
         let fileTypeDiv = document.createElement("div");
         fileTypeDiv.classList.add("file-type-div");
@@ -214,6 +246,10 @@
         let thisOptionData = makeOptionData(levelName, "", fileOptions[0].configText);
         optionData.set(levelName, thisOptionData);
 
+        fileInputButton.onclick = function () {
+            fileInputElement.click();
+        }
+
         let onDataChanged = function (fileChanged) {
             let fileInputValue = fileInputElement.value;
             if (fileChanged) {
@@ -229,6 +265,7 @@
 
             if (fileChanged) {
                 let fullFileName = fileInputValue.split(/([\\/])/g).pop();
+                fileInputLabel.innerText = fullFileName;
                 let fileExt = fullFileName.slice(fullFileName.lastIndexOf(".") + 1);
 
                 let possibleOptions = fileOptions.filter(opt => opt.extensions.includes(fileExt));
@@ -242,8 +279,6 @@
             }
 
             thisOptionData.audioType = fileOptions[fileTypeDropdown.selectedIndex].configText;
-
-            console.log("optionData: " + JSON.stringify(thisOptionData));
         }
 
         fileInputElement.onchange = () => onDataChanged(true);
