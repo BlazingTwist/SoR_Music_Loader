@@ -72,6 +72,14 @@ But `track2` is using a relative path. The musicLoader will look for track2 in
 `[...]/blazingtwist.sor.musicloader/custom/myCustomMusic/someOtherMusic.wav`  
 As such, if you want to use relative paths, you'll need to create a directory of the **same name** as your config-file.
 
+Specifically, this is what your folder structure should look like now:
+![image of the directory structure for custom music](documentation/img/CustomFIleOrganization.png)
+
+Now you can use your music for your custom Levels like this:
+![image showing the music selection GUI](documentation/img/CustomCampaignExample.png)
+
+Absolute paths are intended to ease development. When sharing your mod, you **absolutely should** use relative paths.
+
 ---
 
 ### **Api-Methods**
