@@ -76,6 +76,8 @@ Specifically, this is what your folder structure should look like now:
 
 ![image of the directory structure for custom music](documentation/img/CustomFIleOrganization.png)
 
+*note: you'll have to create the 'custom' folder and its contents manually*
+
 Now you can use your music for your custom Levels like this:
 
 ![image showing the music selection GUI](documentation/img/CustomCampaignExample.png)
